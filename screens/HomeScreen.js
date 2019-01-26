@@ -82,6 +82,21 @@ export default class HomeScreen extends React.Component {
     })
   }
 
+  solve() {
+    let active = this.state.deck.slice(0, 12)
+    valid = []
+
+    for(let i = 0; i < active.length; i++) {
+      for(let j = i+1; j < active.length; j++) {
+        for(let k = j+1; k < active.length; k++) {
+          if (this.validCombination([active[i], active[j], active[k]])) {
+            valid.push([i, j, k])
+          }
+        }
+      }
+    }
+  }
+
   validCombination(selectedCards) {
     let validShape = this.attributeValid(selectedCards, 'shape')
     let validColor = this.attributeValid(selectedCards, 'color')
@@ -98,7 +113,7 @@ export default class HomeScreen extends React.Component {
 
   attributeValid(objects, attr) {
     uniq = Array.from(new Set(objects.map(x => x[attr]))).length
-    return (uniq == 1 || uniq == 3)
+    return (uniq == 1 || uniq == objects.length)
   }
 
   render() {
@@ -117,8 +132,11 @@ export default class HomeScreen extends React.Component {
                     selectCard={ this.selectCard }/>
             ))}
           </View>
+        </View>
+        <View style={ { flex: 1, flexDirection: 'row', width: '100%', height: 40 } }>
           <Button title="Shuffle" onPress={ () => { this.setState({ ...this.state, deck: this.shuffleArray(this.state.deck) })} } />
           <Text>Remaining: {this.state.deck.length}</Text>
+          <Button title="Solve" onPress={ () => { this.solve() } } />
         </View>
       </View>
     );
@@ -167,7 +185,7 @@ const styles = StyleSheet.create({
     marginTop: 80,
     width: '100%',
     height: '80%',
-    flex: 1,
+    flex: 7,
     alignItems: 'center',
   },
   cardsContainer: {
