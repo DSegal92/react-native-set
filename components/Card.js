@@ -22,10 +22,18 @@ class Card extends React.Component {
     this.Shape = props.shape
   }
 
+  highlightedStyle() {
+    if (this.props.selected) {
+      return { borderColor: 'yellow' }
+    }
+    return {}
+  }
+
   render() {
     return (
-      <TouchableHighlight style={ styles.card } onPress={ () => this.props.selectCard(this.props.index) }>
-        <View style={ styles.cardShapes } >
+      <TouchableHighlight style={ { ...styles.card, ...this.highlightedStyle() } }
+                          onPress={ () => this.props.selectCard(this.props.index) }>
+        <View style={ styles.cardShapes }>
           { Array(this.props.cardinality).fill('').map((x, index) => (
             <this.Shape key={ index }
                    color={ this.props.color }

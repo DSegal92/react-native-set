@@ -7,6 +7,7 @@ import {
   Text,
   TouchableOpacity,
   View,
+  Button
 } from 'react-native';
 import { WebBrowser } from 'expo';
 
@@ -64,29 +65,60 @@ export default class HomeScreen extends React.Component {
   };
 
   selectCard(index) {
+    if (this.state.selected.indexOf(index) >= 0) { return }
+    
     this.setState({ ...this.state, selected: [...this.state.selected, index] }, () => {
-      if (this.state.selected.length == 3) {
-        removed = this.state.deck.filter((_, index) =>  { return this.state.selected.indexOf(index) >= 0 } )
-        newDeck = this.state.deck.filter((_, index) =>  { return this.state.selected.indexOf(index) < 0 } )
+      if (this.state.selected.length < 3) { return }
 
-        this.setState({ ...this.state, deck: newDeck, selected: [], removed: removed })
+      selectedCards = this.state.deck.filter((_, index) =>  { return this.state.selected.indexOf(index) >= 0 } )
+
+      if (this.validCombination(selectedCards)) {
+        newDeck = this.state.deck.filter((_, index) =>  { return this.state.selected.indexOf(index) < 0 } )
+        this.setState({ ...this.state, deck: newDeck, selected: [], removed: [ ...this.state.removed, selectedCards] })
+      }
+      else {
+        this.setState({ ...this.state, selected: [] })
       }
     })
   }
 
+  validCombination(selectedCards) {
+    let validShape = this.attributeValid(selectedCards, 'shape')
+    let validColor = this.attributeValid(selectedCards, 'color')
+    let validCardinality = this.attributeValid(selectedCards, 'cardinality')
+    let validStyle = this.attributeValid(selectedCards, 'style')
+
+    let valid = [validShape,
+                 validColor,
+                 validCardinality,
+                 validStyle].reduce((acc, x) => (x ? acc = acc + 1 : acc), 0) == 4
+
+    return valid
+  }
+
+  attributeValid(objects, attr) {
+    uniq = Array.from(new Set(objects.map(x => x[attr]))).length
+    return (uniq == 1 || uniq == 3)
+  }
+
   render() {
     return (
-      <View style={styles.gameBoard}>
-        <View style={ styles.cardsContainer }>
-          { this.state.deck.slice(0, 12).map((c, index) => (
-            <Card key={ c.id }
-                  index={ index }
-                  cardinality={ c.cardinality }
-                  color={ c.color }
-                  style={ c.style }
-                  shape={ c.shape }
-                  selectCard={ this.selectCard }/>
-          ))}
+      <View style={ styles.game }>
+        <View style={styles.gameBoard}>
+          <View style={ styles.cardsContainer }>
+            { this.state.deck.slice(0, 12).map((c, index) => (
+              <Card key={ c.id }
+                    index={ index }
+                    cardinality={ c.cardinality }
+                    color={ c.color }
+                    style={ c.style }
+                    selected={ this.state.selected.indexOf(index) >= 0 }
+                    shape={ c.shape }
+                    selectCard={ this.selectCard }/>
+            ))}
+          </View>
+          <Button title="Shuffle" onPress={ () => { this.setState({ ...this.state, deck: this.shuffleArray(this.state.deck) })} } />
+          <Text>Remaining: {this.state.deck.length}</Text>
         </View>
       </View>
     );
@@ -127,19 +159,24 @@ export default class HomeScreen extends React.Component {
 }
 
 const styles = StyleSheet.create({
+  game: {
+    flex: 1,
+    alignItems: 'center',
+  },
   gameBoard: {
     marginTop: 80,
-    flex: 1,
     width: '100%',
-    height: '100%',
-    alignItems: 'center'
+    height: '80%',
+    flex: 1,
+    alignItems: 'center',
   },
   cardsContainer: {
     flex: 1,
-    width: '100%',
-    height: '90%',
     flexDirection: 'row',
     backgroundColor: '#fff',
-    flexWrap: 'wrap'
+    flexWrap: 'wrap',
+    width: '93%',
+    height: '80%',
+    maxHeight: 650
   },
 });
