@@ -7,7 +7,8 @@ import {
   Text,
   TouchableOpacity,
   View,
-  Button
+  Button,
+  Alert
 } from 'react-native';
 import { WebBrowser } from 'expo';
 
@@ -49,7 +50,8 @@ export default class HomeScreen extends React.Component {
     this.state = {
       deck: this.shuffleArray(deck),
       selected: [],
-      removed: []
+      removed: [],
+      valid: []
     }
   }
 
@@ -66,7 +68,7 @@ export default class HomeScreen extends React.Component {
 
   selectCard(index) {
     if (this.state.selected.indexOf(index) >= 0) { return }
-    
+
     this.setState({ ...this.state, selected: [...this.state.selected, index] }, () => {
       if (this.state.selected.length < 3) { return }
 
@@ -74,7 +76,11 @@ export default class HomeScreen extends React.Component {
 
       if (this.validCombination(selectedCards)) {
         newDeck = this.state.deck.filter((_, index) =>  { return this.state.selected.indexOf(index) < 0 } )
-        this.setState({ ...this.state, deck: newDeck, selected: [], removed: [ ...this.state.removed, selectedCards] })
+        this.setState({ ...this.state,
+                        deck: newDeck,
+                        selected: [],
+                        removed: [ ...this.state.removed, selectedCards],
+                        valid: [] })
       }
       else {
         this.setState({ ...this.state, selected: [] })
@@ -82,19 +88,22 @@ export default class HomeScreen extends React.Component {
     })
   }
 
-  solve() {
+  solve(onlyFindOne) {
     let active = this.state.deck.slice(0, 12)
+    let counter = 0
     valid = []
 
     for(let i = 0; i < active.length; i++) {
       for(let j = i+1; j < active.length; j++) {
         for(let k = j+1; k < active.length; k++) {
           if (this.validCombination([active[i], active[j], active[k]])) {
-            valid.push([i, j, k])
+            valid.push({ id: counter++, cards: [i, j, k]})
           }
         }
       }
     }
+
+    this.setState({ ...this.state, valid: valid })
   }
 
   validCombination(selectedCards) {
@@ -103,17 +112,22 @@ export default class HomeScreen extends React.Component {
     let validCardinality = this.attributeValid(selectedCards, 'cardinality')
     let validStyle = this.attributeValid(selectedCards, 'style')
 
-    let valid = [validShape,
-                 validColor,
-                 validCardinality,
-                 validStyle].reduce((acc, x) => (x ? acc = acc + 1 : acc), 0) == 4
-
-    return valid
+    return [validShape,
+            validColor,
+            validCardinality,
+            validStyle].reduce((acc, x) => (x ? acc = acc + 1 : acc), 0) == 4
+    
   }
 
   attributeValid(objects, attr) {
     uniq = Array.from(new Set(objects.map(x => x[attr]))).length
     return (uniq == 1 || uniq == objects.length)
+  }
+
+  inSolution(index) {
+    if(this.state.valid[0] && this.state.valid[0].cards.indexOf(index) >= 0) {
+      return true
+    }
   }
 
   render() {
@@ -125,6 +139,7 @@ export default class HomeScreen extends React.Component {
               <Card key={ c.id }
                     index={ index }
                     cardinality={ c.cardinality }
+                    inSolution={ this.inSolution(index) }
                     color={ c.color }
                     style={ c.style }
                     selected={ this.state.selected.indexOf(index) >= 0 }
@@ -133,9 +148,9 @@ export default class HomeScreen extends React.Component {
             ))}
           </View>
         </View>
-        <View style={ { flex: 1, flexDirection: 'row', width: '100%', height: 40 } }>
-          <Button title="Shuffle" onPress={ () => { this.setState({ ...this.state, deck: this.shuffleArray(this.state.deck) })} } />
-          <Text>Remaining: {this.state.deck.length}</Text>
+        <View style={ styles.controls }>
+          <Button title="Shuffle" onPress={ () => { this.setState({ ...this.state, deck: this.shuffleArray(this.state.deck), valid: [] })} } />
+          <Text style={{ fontSize: 18, marginHorizontal: 20 }}>Remaining: {this.state.deck.length}</Text>
           <Button title="Solve" onPress={ () => { this.solve() } } />
         </View>
       </View>
@@ -185,7 +200,7 @@ const styles = StyleSheet.create({
     marginTop: 80,
     width: '100%',
     height: '80%',
-    flex: 7,
+    flex: 5,
     alignItems: 'center',
   },
   cardsContainer: {
@@ -197,4 +212,10 @@ const styles = StyleSheet.create({
     height: '80%',
     maxHeight: 650
   },
+  controls: {
+    flex: 1,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+  }
 });

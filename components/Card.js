@@ -6,14 +6,8 @@ import {
   Alert,
   TouchableHighlight
 } from 'react-native'
-import Svg, {
-  Path,
-  Defs,
-  Pattern,
-  Rect,
-  Ellipse,
-  Line
-} from 'react-native-svg'
+
+import ShapeContainer from './shapes/ShapeContainer'
 
 class Card extends React.Component {
   constructor(props) {
@@ -26,6 +20,9 @@ class Card extends React.Component {
     if (this.props.selected) {
       return { borderColor: 'yellow' }
     }
+    if (this.props.inSolution) {
+      return { backgroundColor: 'yellow' }
+    }
     return {}
   }
 
@@ -35,9 +32,12 @@ class Card extends React.Component {
                           onPress={ () => this.props.selectCard(this.props.index) }>
         <View style={ styles.cardShapes }>
           { Array(this.props.cardinality).fill('').map((x, index) => (
-            <this.Shape key={ index }
-                   color={ this.props.color }
-                   style={ this.props.style }/>
+            <View key={ index }>
+              <ShapeContainer color={ this.props.color}
+                              style={ this.props.style }>
+                <this.Shape />
+              </ShapeContainer>
+            </View>
           ))}
         </View>
       </TouchableHighlight>
