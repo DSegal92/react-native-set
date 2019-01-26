@@ -3,6 +3,8 @@ import {
   View,
   Text,
   StyleSheet,
+  Alert,
+  TouchableHighlight
 } from 'react-native'
 import Svg, {
   Path,
@@ -13,20 +15,26 @@ import Svg, {
   Line
 } from 'react-native-svg'
 
-const Card = ({ cardinality, shape, color, style }) => {
-  const Shape = shape
+class Card extends React.Component {
+  constructor(props) {
+    super(props)
 
-  return (
-    <View style={ styles.card }>
-      <View style={ styles.cardShapes } >
-        { Array(cardinality).fill('').map((x, index) => (
-          <Shape key={ index }
-                 color={ color }
-                 style={ style }/>
-        ))}
-      </View>
-    </View>
-  )
+    this.Shape = props.shape
+  }
+
+  render() {
+    return (
+      <TouchableHighlight style={ styles.card } onPress={ () => this.props.selectCard(this.props.index) }>
+        <View style={ styles.cardShapes } >
+          { Array(this.props.cardinality).fill('').map((x, index) => (
+            <this.Shape key={ index }
+                   color={ this.props.color }
+                   style={ this.props.style }/>
+          ))}
+        </View>
+      </TouchableHighlight>
+    )
+  }
 }
 
 export default Card

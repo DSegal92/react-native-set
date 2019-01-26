@@ -43,8 +43,12 @@ export default class HomeScreen extends React.Component {
       }
     }
 
+    this.selectCard = this.selectCard.bind(this)
+
     this.state = {
-      deck: this.shuffleArray(deck)
+      deck: this.shuffleArray(deck),
+      selected: [],
+      removed: []
     }
   }
 
@@ -59,16 +63,29 @@ export default class HomeScreen extends React.Component {
     header: null,
   };
 
+  selectCard(index) {
+    this.setState({ ...this.state, selected: [...this.state.selected, index] }, () => {
+      if (this.state.selected.length == 3) {
+        removed = this.state.deck.filter((_, index) =>  { return this.state.selected.indexOf(index) >= 0 } )
+        newDeck = this.state.deck.filter((_, index) =>  { return this.state.selected.indexOf(index) < 0 } )
+
+        this.setState({ ...this.state, deck: newDeck, selected: [], removed: removed })
+      }
+    })
+  }
+
   render() {
     return (
       <View style={styles.gameBoard}>
         <View style={ styles.cardsContainer }>
-          { this.state.deck.slice(0, 12).map(c => (
+          { this.state.deck.slice(0, 12).map((c, index) => (
             <Card key={ c.id }
+                  index={ index }
                   cardinality={ c.cardinality }
                   color={ c.color }
                   style={ c.style }
-                  shape={ c.shape } />
+                  shape={ c.shape }
+                  selectCard={ this.selectCard }/>
           ))}
         </View>
       </View>
