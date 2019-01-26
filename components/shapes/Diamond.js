@@ -3,12 +3,13 @@ import Svg, {
   Path,
   Defs,
   Pattern,
-  Line
+  Line,
+  Rect
 } from 'react-native-svg'
 
 import Styles from './Styles'
 
-const Squiggle = ({ style, color }) => {
+const Diamond = ({ style, color }) => {
   fillStyle = () => {
     if (style == Styles.SHADED) {
       return 'url(#ShadedPattern)'
@@ -20,7 +21,7 @@ const Squiggle = ({ style, color }) => {
     return '#FFF'
   }
   return (
-    <Svg width="100%" height="45" viewBox="-20 0 800 400">
+    <Svg width="100%" height="45" viewBox="-315 -20 800 400">
       <Defs>
         <Pattern
           id="ShadedPattern"
@@ -42,15 +43,18 @@ const Squiggle = ({ style, color }) => {
         </Pattern>
       </Defs>
 
-      <Path
-          d="M0,266.963S13.5-38.385,321.862,82.6C654.607,213.163,666.911-101.212,746.237,103.21c-0.1.092,32.1,163.538-90.7,223.539-101.542,49.613-126.193,82.821-312.028,15.185-38.684-14.079-135.094-19.912-191.495,27.621C152.011,369.555.126,510.117,0,266.963Z"
-          stroke={ color }
-          fill={ fillStyle() }
-          strokeWidth="20"
-          scale=".95"
+      <Rect
+        x="0"
+        y="0"
+        width="250"
+        height="250"
+        fill={ fillStyle() }
+        rotation="45"
+        strokeWidth="20"
+        stroke={ color }
       />
     </Svg>
   )
 }
 
-export default Squiggle
+export default Diamond

@@ -12,7 +12,6 @@ import Svg, {
   Ellipse,
   Line
 } from 'react-native-svg'
-import Squiggle from './shapes/squiggle'
 
 const Card = ({ cardinality, shape, color, style }) => {
   const Shape = shape

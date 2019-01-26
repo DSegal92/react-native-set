@@ -12,7 +12,9 @@ import { WebBrowser } from 'expo';
 
 import { MonoText } from '../components/StyledText';
 import Card from '../components/Card'
-import Squiggle from '../components/shapes/squiggle'
+import Squiggle from '../components/shapes/Squiggle'
+import Diamond from '../components/shapes/Diamond'
+import Oval from '../components/shapes/Oval'
 
 import Styles from '../components/shapes/Styles'
 
@@ -22,17 +24,21 @@ export default class HomeScreen extends React.Component {
 
     const deck = []
 
+    const shapes= [Squiggle, Diamond, Oval]
     const cardinality = [1,2,3]
-    const colors = ['red', 'purple', 'green']
+    const colors = ['#ed2027', '#613394', '#03a951']
     const styles = [ Styles.SHADED, Styles.OUTLINED, Styles.FILLED ]
 
     for(let i = 0; i < cardinality.length; i++) {
       for(let j = 0; j < colors.length; j++) {
         for(let k = 0; k < styles.length; k++) {
-          deck.push({ id: `${i}${j}${k}`,
-                      cardinality: cardinality[i],
-                      color: colors[j],
-                      style: styles[k]})
+          for(let l = 0; l < shapes.length; l++) {
+            deck.push({ id: `${i}${j}${k}${l}`,
+                        cardinality: cardinality[i],
+                        color: colors[j],
+                        style: styles[k],
+                        shape: shapes[l] })
+          }
         }
       }
     }
@@ -62,7 +68,7 @@ export default class HomeScreen extends React.Component {
                   cardinality={ c.cardinality }
                   color={ c.color }
                   style={ c.style }
-                  shape={ Squiggle } />
+                  shape={ c.shape } />
           ))}
         </View>
       </View>
