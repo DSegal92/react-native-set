@@ -17,12 +17,8 @@ class Card extends React.Component {
   }
 
   highlightedStyle() {
-    if (this.props.selected) {
-      return { borderColor: 'yellow' }
-    }
-    if (this.props.inSolution) {
-      return { backgroundColor: 'yellow' }
-    }
+    if (this.props.selected) { return { borderColor: 'yellow' } }
+    if (this.props.inSolution) { return { backgroundColor: 'yellow' } }
     return {}
   }
 
